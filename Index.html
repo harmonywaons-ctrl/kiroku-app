@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>きろくノート</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+
+:root {
+–bg: #f7f2eb;
+–white: #fffdf9;
+–brown: #6b4c35;
+–brown-light: #c8a87a;
+–brown-pale: #ede0ce;
+–green: #7aaa88;
+–green-pale: #e6f2ea;
+–blue: #7a9eb5;
+–blue-pale: #e6eef4;
+–orange: #e07a52;
+–orange-pale: #faeee8;
+–gray: #a89880;
+–border: #ddd0bc;
+–text: #3a2a1e;
+–shadow: rgba(107,76,53,0.10);
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘Zen Maru Gothic’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+}
+
+/* Texture overlay */
+body::after {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+radial-gradient(ellipse 70% 50% at 15% 10%, rgba(200,168,122,0.10) 0%, transparent 60%),
+radial-gradient(ellipse 50% 70% at 85% 90%, rgba(122,170,136,0.08) 0%, transparent 60%);
+pointer-events: none;
+z-index: 0;
+}
+
+.wrap {
+position: relative;
+z-index: 1;
+max-width: 520px;
+margin: 0 auto;
+padding: 20px 16px 40px;
+width: 100%;
+}
+
+/* ── Header ── */
+.app-header {
+text-align: center;
+margin-bottom: 24px;
+}
+.app-header .logo {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+background: var(–white);
+border: 1.5px solid var(–border);
+border-radius: 50px;
+padding: 8px 20px;
+box-shadow: 0 2px 12px var(–shadow);
+margin-bottom: 6px;
+}
+.app-header h1 {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 1.25rem;
+color: var(–brown);
+letter-spacing: 0.08em;
+}
+.app-header p {
+font-size: 0.75rem;
+color: var(–brown-light);
+}
+
+/* ── Step indicator ── */
+.steps {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 0;
+margin-bottom: 22px;
+}
+.step-dot {
+width: 28px; height: 28px;
+border-radius: 50%;
+background: var(–white);
+border: 2px solid var(–border);
+color: var(–gray);
+font-size: 0.72rem;
+font-weight: 700;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.3s;
+position: relative;
+z-index: 1;
+}
+.step-dot.active { background: var(–brown); border-color: var(–brown); color: white; }
+.step-dot.done { background: var(–green); border-color: var(–green); color: white; }
+.step-line {
+flex: 1; height: 2px;
+background: var(–border);
+max-width: 40px;
+}
+.step-line.done { background: var(–green); }
+.step-label {
+position: absolute;
+top: 32px;
+font-size: 0.62rem;
+color: var(–gray);
+white-space: nowrap;
+left: 50%;
+transform: translateX(-50%);
+}
+.step-dot.active .step-label { color: var(–brown); font-weight: 700; }
+.step-dot.done .step-label { color: var(–green); }
+
+/* ── Card ── */
+.card {
+background: var(–white);
+border-radius: 20px;
+border: 1.5px solid var(–border);
+box-shadow: 0 4px 20px var(–shadow);
+padding: 24px 20px;
+margin-bottom: 14px;
+animation: fadeUp 0.3s ease;
+}
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(10px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+.card-title {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 0.95rem;
+color: var(–brown);
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.card-title svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ── Student grid ── */
+.student-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 8px;
+}
+.student-btn {
+padding: 12px 6px;
+border-radius: 14px;
+border: 1.5px solid var(–border);
+background: var(–bg);
+cursor: pointer;
+text-align: center;
+transition: all 0.18s;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+color: var(–brown);
+font-size: 0.82rem;
+font-weight: 500;
+}
+.student-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(–shadow); border-color: var(–brown-light); }
+.student-btn.sel { background: var(–brown); color: white; border-color: var(–brown); }
+.student-icon { margin-bottom: 4px; }
+.student-icon svg { width: 26px; height: 26px; }
+
+/* Add student */
+.add-student-row {
+display: flex; gap: 8px; margin-top: 12px;
+}
+.add-student-row input {
+flex: 1;
+padding: 9px 12px;
+border: 1.5px solid var(–border);
+border-radius: 10px;
+background: var(–bg);
+font-family: ‘Zen Maru Gothic’, sans-serif;
+font-size: 0.85rem;
+color: var(–text);
+outline: none;
+}
+.add-student-row input:focus { border-color: var(–brown-light); }
+.add-student-row button {
+padding: 9px 14px;
+background: var(–brown);
+color: white;
+border: none;
+border-radius: 10px;
+cursor: pointer;
+font-size: 0.82rem;
+font-weight: 700;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+white-space: nowrap;
+}
+
+/* ── Category ── */
+.cat-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+}
+.cat-btn {
+padding: 14px 10px;
+border-radius: 14px;
+border: 2px solid var(–border);
+background: var(–bg);
+cursor: pointer;
+text-align: center;
+transition: all 0.18s;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+font-size: 0.82rem;
+font-weight: 700;
+color: var(–text);
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 6px;
+}
+.cat-btn svg { width: 22px; height: 22px; }
+.cat-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(–shadow); }
+.cat-btn[data-cat=“学習”].sel        { background: var(–brown-pale); border-color: var(–brown); color: var(–brown); }
+.cat-btn[data-cat=“生活・行動”].sel  { background: var(–green-pale); border-color: var(–green); color: #4a8a5c; }
+.cat-btn[data-cat=“友達との関わり”].sel { background: var(–blue-pale); border-color: var(–blue); color: #3a6e8c; }
+.cat-btn[data-cat=“その他”].sel      { background: var(–orange-pale); border-color: var(–orange); color: #b0522a; }
+
+/* ── Voice ── */
+.voice-area {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+}
+
+.mic-btn {
+width: 88px; height: 88px;
+border-radius: 50%;
+border: none;
+background: var(–brown);
+color: white;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 6px 20px rgba(107,76,53,0.30);
+transition: all 0.2s;
+position: relative;
+}
+.mic-btn:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(107,76,53,0.38); }
+.mic-btn.recording {
+background: #d94f4f;
+animation: pulse-mic 1.2s infinite;
+}
+.mic-btn svg { width: 36px; height: 36px; }
+
+@keyframes pulse-mic {
+0%   { box-shadow: 0 0 0 0 rgba(217,79,79,0.5); }
+70%  { box-shadow: 0 0 0 18px rgba(217,79,79,0); }
+100% { box-shadow: 0 0 0 0 rgba(217,79,79,0); }
+}
+
+.mic-label {
+font-size: 0.82rem;
+color: var(–gray);
+text-align: center;
+}
+.mic-label.recording { color: #d94f4f; font-weight: 700; }
+
+.transcript-box {
+width: 100%;
+min-height: 90px;
+padding: 13px 14px;
+border: 1.5px solid var(–border);
+border-radius: 13px;
+background: var(–bg);
+font-family: ‘Zen Maru Gothic’, sans-serif;
+font-size: 0.9rem;
+color: var(–text);
+line-height: 1.75;
+outline: none;
+resize: vertical;
+}
+.transcript-box:focus { border-color: var(–brown-light); }
+
+.voice-hint {
+font-size: 0.76rem;
+color: var(–brown-light);
+text-align: center;
+}
+
+/* ── Confirm card ── */
+.confirm-row {
+display: flex;
+gap: 8px;
+padding: 10px 12px;
+background: var(–bg);
+border-radius: 10px;
+margin-bottom: 10px;
+font-size: 0.83rem;
+}
+.confirm-label {
+color: var(–brown-light);
+font-weight: 700;
+min-width: 80px;
+flex-shrink: 0;
+}
+.confirm-value { color: var(–text); line-height: 1.6; }
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 10px; margin-top: 6px; }
+.btn {
+flex: 1;
+padding: 13px 10px;
+border: none;
+border-radius: 12px;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+font-size: 0.88rem;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.18s;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+}
+.btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.btn-back { background: var(–bg); border: 1.5px solid var(–border); color: var(–brown); }
+.btn-back:hover { background: var(–brown-pale); }
+.btn-next { background: var(–brown); color: white; box-shadow: 0 4px 12px rgba(107,76,53,0.22); }
+.btn-next:hover { background: #4e3427; transform: translateY(-1px); }
+.btn-save { background: var(–green); color: white; box-shadow: 0 4px 12px rgba(122,170,136,0.28); }
+.btn-save:hover { background: #5a9068; transform: translateY(-1px); }
+.btn-save:disabled { background: var(–gray); cursor: not-allowed; transform: none; }
+
+/* ── Success ── */
+.success-card {
+text-align: center;
+padding: 32px 20px;
+}
+.success-icon {
+width: 72px; height: 72px;
+background: var(–green-pale);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+margin: 0 auto 16px;
+border: 2px solid var(–green);
+}
+.success-icon svg { width: 36px; height: 36px; }
+.success-title {
+font-family: ‘Noto Serif JP’, serif;
+font-size: 1.1rem;
+color: var(–brown);
+margin-bottom: 6px;
+}
+.success-sub { font-size: 0.8rem; color: var(–gray); margin-bottom: 20px; }
+.sheets-badge {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+background: var(–green-pale);
+border: 1.5px solid var(–green);
+border-radius: 20px;
+padding: 5px 14px;
+font-size: 0.78rem;
+color: #4a8a5c;
+font-weight: 700;
+margin-bottom: 20px;
+}
+.sheets-badge svg { width: 13px; height: 13px; }
+
+/* ── Settings ── */
+.settings-toggle {
+text-align: center;
+margin-top: 8px;
+}
+.settings-toggle button {
+background: none;
+border: none;
+color: var(–brown-light);
+font-size: 0.76rem;
+cursor: pointer;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+text-decoration: underline;
+padding: 4px;
+}
+.settings-panel {
+background: var(–white);
+border: 1.5px solid var(–border);
+border-radius: 16px;
+padding: 18px;
+margin-bottom: 14px;
+display: none;
+}
+.settings-panel.open { display: block; animation: fadeUp 0.2s ease; }
+.settings-panel label { display: block; font-size: 0.76rem; color: var(–brown-light); font-weight: 700; margin-bottom: 5px; letter-spacing: 0.04em; }
+.settings-panel input {
+width: 100%;
+padding: 9px 12px;
+border: 1.5px solid var(–border);
+border-radius: 9px;
+background: var(–bg);
+font-size: 0.82rem;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+color: var(–text);
+outline: none;
+margin-bottom: 10px;
+}
+.settings-panel input:focus { border-color: var(–brown-light); }
+.settings-hint {
+font-size: 0.74rem;
+color: var(–gray);
+line-height: 1.7;
+margin-bottom: 12px;
+}
+.settings-panel .save-btn {
+background: var(–brown);
+color: white;
+border: none;
+border-radius: 9px;
+padding: 8px 18px;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+font-size: 0.82rem;
+font-weight: 700;
+cursor: pointer;
+}
+
+/* Apps Script code block */
+.code-block {
+background: #2a2a2a;
+color: #e8e8d8;
+border-radius: 10px;
+padding: 12px;
+font-size: 0.7rem;
+font-family: monospace;
+line-height: 1.7;
+white-space: pre-wrap;
+margin: 8px 0 10px;
+position: relative;
+overflow-x: auto;
+}
+.copy-code-btn {
+position: absolute;
+top: 8px; right: 8px;
+background: rgba(255,255,255,0.12);
+color: #ccc;
+border: none;
+border-radius: 6px;
+padding: 3px 9px;
+font-size: 0.7rem;
+cursor: pointer;
+font-family: ‘Zen Maru Gothic’, sans-serif;
+}
+
+/* step guide */
+.step-guide { counter-reset: guide; }
+.step-guide li {
+list-style: none;
+counter-increment: guide;
+display: flex;
+align-items: flex-start;
+gap: 8px;
+font-size: 0.78rem;
+color: var(–text);
+line-height: 1.7;
+margin-bottom: 6px;
+}
+.step-guide li::before {
+content: counter(guide);
+min-width: 20px; height: 20px;
+background: var(–brown);
+color: white;
+border-radius: 50%;
+display: flex; align-items: center; justify-content: center;
+font-size: 0.68rem;
+font-weight: 700;
+flex-shrink: 0;
+margin-top: 2px;
+}
+
+/* ── Status bar ── */
+.status-bar {
+font-size: 0.74rem;
+color: var(–gray);
+text-align: center;
+margin-top: 6px;
+}
+.status-bar.ok { color: var(–green); font-weight: 700; }
+.status-bar.err { color: var(–orange); }
+
+/* Selected badge */
+.sel-badge {
+display: inline-flex;
+align-items: center;
+gap: 5px;
+background: var(–brown-pale);
+border-radius: 20px;
+padding: 3px 10px;
+font-size: 0.74rem;
+color: var(–brown);
+font-weight: 700;
+margin-bottom: 12px;
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+
+  <div class="app-header">
+    <div class="logo">
+      <!-- notebook SVG -->
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+        <rect x="5" y="3" width="20" height="26" rx="3" fill="#f5e8d8" stroke="#c4a07a" stroke-width="1.3"/>
+        <rect x="5" y="3" width="4" height="26" rx="2" fill="#dcc8ae"/>
+        <line x1="12" y1="10" x2="22" y2="10" stroke="#e0c9a8" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="12" y1="15" x2="22" y2="15" stroke="#e0c9a8" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="12" y1="20" x2="18" y2="20" stroke="#e0c9a8" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="7" cy="10" r="1.2" fill="#bfa080"/>
+        <circle cx="7" cy="16" r="1.2" fill="#bfa080"/>
+        <circle cx="7" cy="22" r="1.2" fill="#bfa080"/>
+      </svg>
+      <h1>きろくノート</h1>
+    </div>
+    <p>児童の様子をすぐに記録できます</p>
+  </div>
+
+  <!-- Settings toggle -->
+
+  <div class="settings-toggle">
+    <button onclick="toggleSettings()">⚙ スプレッドシート設定</button>
+  </div>
+
+  <!-- Settings panel -->
+
+  <div class="settings-panel" id="settings-panel">
+    <label>Google Apps Script の URL</label>
+    <input type="text" id="sheets-url-input" placeholder="https://script.google.com/macros/s/...">
+    <div class="settings-hint">
+      スプレッドシートに自動で記録を送るためのURLです。<br>
+      まだ設定していない場合は下の手順で取得してください。
+    </div>
+    <button class="save-btn" onclick="saveSheetUrl()">URLを保存する</button>
+
+```
+<div style="margin-top:16px;border-top:1px dashed var(--border);padding-top:14px;">
+  <div style="font-size:0.76rem;font-weight:700;color:var(--brown);margin-bottom:8px;">はじめての設定手順</div>
+  <ol class="step-guide">
+    <li>Googleスプレッドシートを新規作成する</li>
+    <li>メニューの「拡張機能」→「Apps Script」を開く</li>
+    <li>下のコードをコピーして貼り付け、保存する</li>
+    <li>「デプロイ」→「新しいデプロイ」→「ウェブアプリ」で公開<br>
+      <span style="font-size:0.7rem;color:var(--gray);">（「アクセスできるユーザー」は「全員」を選択）</span></li>
+    <li>表示されたURLをコピーして上の欄に貼り付ける</li>
+  </ol>
+  <div style="position:relative;">
+    <pre class="code-block" id="gas-code">function doPost(e) {
+```
+
+var sheet = SpreadsheetApp
+.getActiveSpreadsheet()
+.getActiveSheet();
+var p = JSON.parse(e.postData.contents);
+
+if (sheet.getLastRow() === 0) {
+sheet.appendRow([
+‘日付’,‘児童名’,‘カテゴリー’,‘記録内容’
+]);
+}
+sheet.appendRow([
+p.date, p.name, p.cat, p.text
+]);
+
+return ContentService
+.createTextOutput(
+JSON.stringify({status:‘ok’})
+)
+.setMimeType(
+ContentService.MimeType.JSON
+);
+}</pre>
+<button class="copy-code-btn" onclick="copyCode()">コピー</button>
+</div>
+</div>
+<div class="status-bar" id="url-status"></div>
+
+  </div>
+
+  <!-- Step indicator -->
+
+  <div class="steps" id="steps-wrap">
+    <div class="step-dot active" id="dot-1">1<span class="step-label">児童</span></div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-dot" id="dot-2">2<span class="step-label">カテゴリー</span></div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-dot" id="dot-3">3<span class="step-label">記録</span></div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-dot" id="dot-4">4<span class="step-label">確認</span></div>
+  </div>
+
+  <!-- STEP 1: 児童選択 -->
+
+  <div class="card" id="step1">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      誰の記録ですか？
+    </div>
+    <div class="student-grid" id="student-grid">
+      <div style="grid-column:1/-1;font-size:0.8rem;color:var(--gray);">下に名前を入力して「追加」してください</div>
+    </div>
+    <div class="add-student-row">
+      <input type="text" id="new-name" placeholder="名前を入力（例：さとうたろう）" onkeydown="if(event.key==='Enter')addStudent()">
+      <button onclick="addStudent()">追加</button>
+    </div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-next" onclick="goStep(2)">
+        次へ
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: カテゴリー -->
+
+  <div class="card" id="step2" style="display:none;">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      どの内容ですか？
+    </div>
+    <div id="step2-badge" class="sel-badge"></div>
+    <div class="cat-grid">
+      <button class="cat-btn" data-cat="学習" onclick="selectCat(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        学習
+      </button>
+      <button class="cat-btn" data-cat="生活・行動" onclick="selectCat(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        生活・行動
+      </button>
+      <button class="cat-btn" data-cat="友達との関わり" onclick="selectCat(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        友達との関わり
+      </button>
+      <button class="cat-btn" data-cat="その他" onclick="selectCat(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        その他
+      </button>
+    </div>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn btn-back" onclick="goStep(1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        戻る
+      </button>
+      <button class="btn btn-next" onclick="goStep(3)">
+        次へ
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: 音声・テキスト入力 -->
+
+  <div class="card" id="step3" style="display:none;">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      話して記録する
+    </div>
+    <div id="step3-badge" class="sel-badge"></div>
+
+```
+<div class="voice-area">
+  <button class="mic-btn" id="mic-btn" onclick="toggleRecording()">
+    <svg id="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </button>
+  <div class="mic-label" id="mic-label">タップして話す</div>
+  <textarea class="transcript-box" id="transcript" placeholder="マイクボタンを押して話してください。話した内容がここに表示されます。直接入力もできます。"></textarea>
+  <div class="voice-hint">話し終わったら自動で止まります。内容を確認・修正してから「次へ」</div>
+</div>
+
+<div class="btn-row" style="margin-top:14px;">
+  <button class="btn btn-back" onclick="goStep(2)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    戻る
+  </button>
+  <button class="btn btn-next" onclick="goStep(4)">
+    確認する
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+</div>
+```
+
+  </div>
+
+  <!-- STEP 4: 確認・保存 -->
+
+  <div class="card" id="step4" style="display:none;">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--brown)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      内容を確認する
+    </div>
+    <div class="confirm-row"><span class="confirm-label">児童名</span><span class="confirm-value" id="cf-name">—</span></div>
+    <div class="confirm-row"><span class="confirm-label">カテゴリー</span><span class="confirm-value" id="cf-cat">—</span></div>
+    <div class="confirm-row"><span class="confirm-label">日付</span><span class="confirm-value" id="cf-date">—</span></div>
+    <div class="confirm-row" style="flex-direction:column;gap:4px;">
+      <span class="confirm-label">記録内容</span>
+      <span class="confirm-value" id="cf-text" style="word-break:break-all;">—</span>
+    </div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-back" onclick="goStep(3)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        修正する
+      </button>
+      <button class="btn btn-save" id="save-btn" onclick="saveRecord()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+        保存する
+      </button>
+    </div>
+    <div class="status-bar" id="save-status"></div>
+  </div>
+
+  <!-- STEP 5: 完了 -->
+
+  <div class="card" id="step5" style="display:none;">
+    <div class="success-card">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title">記録しました！</div>
+      <div class="success-sub" id="success-name">さんの記録を保存しました</div>
+      <div id="sheets-sent-badge" style="display:none;" class="sheets-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        スプレッドシートに送信しました
+      </div>
+      <button class="btn btn-next" style="width:100%;justify-content:center;" onclick="resetAll()">
+        つぎの記録へ
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div><!-- /.wrap -->
+
+<script>
+// ── Storage ──────────────────────────────────────────────
+const STORE_KEY = 'kiroku_v1';
+var cfg = { students: [], sheetsUrl: '' };
+
+async function loadCfg() {
+  try {
+    var r = await window.storage.get(STORE_KEY);
+    if (r) cfg = JSON.parse(r.value);
+    if (!cfg.students) cfg.students = [];
+  } catch(e) {}
+  renderStudents();
+  var inp = document.getElementById('sheets-url-input');
+  if (inp && cfg.sheetsUrl) inp.value = cfg.sheetsUrl;
+  updateUrlStatus();
+}
+async function saveCfg() {
+  try { await window.storage.set(STORE_KEY, JSON.stringify(cfg)); } catch(e) {}
+}
+
+// ── State ────────────────────────────────────────────────
+var selStudent = null;
+var selCat = null;
+var curStep = 1;
+
+// ── Students ─────────────────────────────────────────────
+function childSVG() {
+  return '<svg width="24" height="24" viewBox="0 0 32 32" fill="none">'
+    + '<circle cx="16" cy="9" r="5.5" fill="rgba(220,180,140,0.75)" stroke="#c4a07a" stroke-width="1.2"/>'
+    + '<path d="M8 27 Q8 18 16 18 Q24 18 24 27" fill="rgba(137,175,196,0.55)" stroke="#89afc4" stroke-width="1.2"/>'
+    + '<circle cx="14" cy="8.5" r="0.9" fill="#7a5c44"/>'
+    + '<circle cx="18" cy="8.5" r="0.9" fill="#7a5c44"/>'
+    + '<path d="M13.5 11.5 Q16 13.2 18.5 11.5" stroke="#c4a07a" stroke-width="1" fill="none" stroke-linecap="round"/>'
+    + '</svg>';
+}
+
+function addStudent() {
+  var name = document.getElementById('new-name').value.trim();
+  if (!name) return;
+  if (cfg.students.indexOf(name) >= 0) { alert('同じ名前がすでにあります'); return; }
+  cfg.students.push(name);
+  document.getElementById('new-name').value = '';
+  saveCfg();
+  renderStudents();
+}
+
+function renderStudents() {
+  var grid = document.getElementById('student-grid');
+  if (!cfg.students.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;font-size:0.8rem;color:var(--gray);">下に名前を入力して追加してください</div>';
+    return;
+  }
+  grid.innerHTML = cfg.students.map(function(name) {
+    var sel = selStudent === name ? 'sel' : '';
+    return '<button class="student-btn ' + sel + '" onclick="selectStudent(\'' + esc(name) + '\')">'
+      + '<div class="student-icon">' + childSVG() + '</div>'
+      + esc(name) + '</button>';
+  }).join('');
+}
+
+function selectStudent(name) {
+  selStudent = selStudent === name ? null : name;
+  renderStudents();
+}
+
+// ── Category ─────────────────────────────────────────────
+function selectCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  selCat = btn.dataset.cat;
+}
+
+// ── Steps ────────────────────────────────────────────────
+function goStep(n) {
+  // Validation
+  if (n === 2 && !selStudent) { alert('児童を選んでください'); return; }
+  if (n === 3 && !selCat) { alert('カテゴリーを選んでください'); return; }
+  if (n === 4) {
+    var txt = document.getElementById('transcript').value.trim();
+    if (!txt) { alert('記録内容を入力してください'); return; }
+    // Fill confirm
+    document.getElementById('cf-name').textContent = selStudent;
+    document.getElementById('cf-cat').textContent = selCat;
+    document.getElementById('cf-date').textContent = new Date().toLocaleDateString('ja-JP');
+    document.getElementById('cf-text').textContent = txt;
+  }
+  // Badges
+  if (n >= 2) {
+    document.getElementById('step2-badge').innerHTML = childSVG() + ' ' + esc(selStudent || '');
+  }
+  if (n >= 3) {
+    document.getElementById('step3-badge').innerHTML = childSVG() + ' ' + esc(selStudent || '') + '　' + esc(selCat || '');
+  }
+
+  curStep = n;
+  [1,2,3,4,5].forEach(function(i){
+    var el = document.getElementById('step' + i);
+    if (el) el.style.display = (i === n) ? 'block' : 'none';
+  });
+  updateDots();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateDots() {
+  [1,2,3,4].forEach(function(i) {
+    var dot = document.getElementById('dot-' + i);
+    var line = document.getElementById('line-' + i);
+    if (!dot) return;
+    dot.classList.remove('active','done');
+    if (i < curStep) dot.classList.add('done');
+    else if (i === curStep) dot.classList.add('active');
+    if (line) { line.classList.toggle('done', i < curStep); }
+  });
+  var sw = document.getElementById('steps-wrap');
+  if (sw) sw.style.display = curStep === 5 ? 'none' : 'flex';
+}
+
+// ── Voice ─────────────────────────────────────────────────
+var recognition = null;
+var isRecording = false;
+
+function initSpeech() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  var r = new SR();
+  r.lang = 'ja-JP';
+  r.continuous = true;
+  r.interimResults = true;
+  r.onresult = function(e) {
+    var final = '';
+    var interim = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      var t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) final += t;
+      else interim += t;
+    }
+    var box = document.getElementById('transcript');
+    var base = box.dataset.base || '';
+    box.value = base + final + interim;
+    if (final) box.dataset.base = base + final;
+  };
+  r.onerror = function(e) {
+    stopRecording();
+    if (e.error === 'not-allowed') alert('マイクの使用が許可されていません。ブラウザの設定を確認してください。');
+  };
+  r.onend = function() { if (isRecording) stopRecording(); };
+  return r;
+}
+
+function toggleRecording() {
+  if (isRecording) stopRecording();
+  else startRecording();
+}
+function startRecording() {
+  if (!recognition) recognition = initSpeech();
+  if (!recognition) { alert('このブラウザは音声入力に対応していません。テキストを直接入力してください。'); return; }
+  var box = document.getElementById('transcript');
+  box.dataset.base = box.value;
+  recognition.start();
+  isRecording = true;
+  document.getElementById('mic-btn').classList.add('recording');
+  document.getElementById('mic-label').textContent = '話しています… もう一度タップで停止';
+  document.getElementById('mic-label').classList.add('recording');
+}
+function stopRecording() {
+  if (recognition) try { recognition.stop(); } catch(e) {}
+  isRecording = false;
+  document.getElementById('mic-btn').classList.remove('recording');
+  document.getElementById('mic-label').textContent = 'タップして話す';
+  document.getElementById('mic-label').classList.remove('recording');
+}
+
+// ── Save ─────────────────────────────────────────────────
+async function saveRecord() {
+  var btn = document.getElementById('save-btn');
+  var status = document.getElementById('save-status');
+  btn.disabled = true;
+  btn.textContent = '保存中…';
+  status.textContent = '';
+  status.className = 'status-bar';
+
+  var payload = {
+    date: new Date().toLocaleDateString('ja-JP'),
+    name: selStudent,
+    cat: selCat,
+    text: document.getElementById('transcript').value.trim()
+  };
+
+  var sheetOk = false;
+  if (cfg.sheetsUrl) {
+    try {
+      await fetch(cfg.sheetsUrl, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'text/plain' }
+      });
+      sheetOk = true;
+    } catch(e) {
+      status.textContent = 'シートへの送信に失敗しました。URLを確認してください。';
+      status.className = 'status-bar err';
+    }
+  }
+
+  // Success screen
+  document.getElementById('success-name').textContent = selStudent + ' さんの記録を保存しました';
+  var badge = document.getElementById('sheets-sent-badge');
+  badge.style.display = sheetOk ? 'inline-flex' : 'none';
+  goStep(5);
+}
+
+function resetAll() {
+  selCat = null;
+  document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('sel'); });
+  document.getElementById('transcript').value = '';
+  document.getElementById('transcript').dataset.base = '';
+  document.getElementById('save-btn').disabled = false;
+  document.getElementById('save-btn').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>保存する';
+  goStep(1);
+}
+
+// ── Settings ─────────────────────────────────────────────
+function toggleSettings() {
+  var p = document.getElementById('settings-panel');
+  p.classList.toggle('open');
+}
+function saveSheetUrl() {
+  var url = document.getElementById('sheets-url-input').value.trim();
+  cfg.sheetsUrl = url;
+  saveCfg();
+  updateUrlStatus();
+  showToast('URLを保存しました');
+}
+function updateUrlStatus() {
+  var el = document.getElementById('url-status');
+  if (!el) return;
+  if (cfg.sheetsUrl) {
+    el.textContent = '✓ 連携済み：記録を保存するたびに自動送信されます';
+    el.className = 'status-bar ok';
+  } else {
+    el.textContent = '';
+  }
+}
+function copyCode() {
+  var el = document.getElementById('gas-code');
+  navigator.clipboard.writeText(el.textContent);
+  showToast('コードをコピーしました');
+}
+
+// ── Util ─────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+    background:'var(--brown)', color:'white', padding:'9px 20px',
+    borderRadius:'20px', fontSize:'0.82rem', zIndex:'9999',
+    boxShadow:'0 4px 14px rgba(0,0,0,0.18)', opacity:'0',
+    transition:'opacity 0.3s', fontFamily:"'Zen Maru Gothic', sans-serif"
+  });
+  document.body.appendChild(t);
+  requestAnimationFrame(function(){ t.style.opacity = '1'; });
+  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); }, 2200);
+}
+
+loadCfg();
+</script>
+
+</body>
+</html>
