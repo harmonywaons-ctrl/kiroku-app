@@ -160,8 +160,8 @@ gap: 8px;
 .student-btn {
 padding: 12px 6px;
 border-radius: 14px;
-border: 1.5px solid var(–border);
-background: var(–bg);
+border: 2px solid var(–border);
+background: white;
 cursor: pointer;
 text-align: center;
 transition: all 0.18s;
@@ -170,8 +170,9 @@ color: var(–brown);
 font-size: 0.82rem;
 font-weight: 500;
 }
-.student-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(–shadow); border-color: var(–brown-light); }
-.student-btn.sel { background: var(–brown); color: white; border-color: var(–brown); }
+.student-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(–shadow); border-color: #4a8ab0; }
+.student-btn:active { background: var(–orange); color: white; border-color: var(–orange); transform: scale(0.97); }
+.student-btn.sel { background: var(–orange); color: white; border-color: #c86030; box-shadow: 0 4px 14px rgba(224,122,82,0.40); }
 .student-icon { margin-bottom: 4px; }
 .student-icon svg { width: 26px; height: 26px; }
 
@@ -214,7 +215,7 @@ gap: 10px;
 padding: 14px 10px;
 border-radius: 14px;
 border: 2px solid var(–border);
-background: var(–bg);
+background: white;
 cursor: pointer;
 text-align: center;
 transition: all 0.18s;
@@ -228,11 +229,9 @@ align-items: center;
 gap: 6px;
 }
 .cat-btn svg { width: 22px; height: 22px; }
-.cat-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(–shadow); }
-.cat-btn[data-cat=“学習”].sel        { background: var(–brown-pale); border-color: var(–brown); color: var(–brown); }
-.cat-btn[data-cat=“生活・行動”].sel  { background: var(–green-pale); border-color: var(–green); color: #4a8a5c; }
-.cat-btn[data-cat=“友達との関わり”].sel { background: var(–blue-pale); border-color: var(–blue); color: #3a6e8c; }
-.cat-btn[data-cat=“その他”].sel      { background: var(–orange-pale); border-color: var(–orange); color: #b0522a; }
+.cat-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(–shadow); border-color: #4a8ab0; }
+.cat-btn:active { background: var(–orange); color: white; border-color: var(–orange); transform: scale(0.97); }
+.cat-btn.sel { background: var(–orange); color: white; border-color: #c86030; box-shadow: 0 4px 14px rgba(224,122,82,0.40); }
 
 /* ── Voice ── */
 .voice-area {
@@ -334,13 +333,16 @@ justify-content: center;
 gap: 6px;
 }
 .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
-.btn-back { background: var(–bg); border: 1.5px solid var(–border); color: var(–brown); }
-.btn-back:hover { background: var(–brown-pale); }
-.btn-next { background: var(–brown); color: white; box-shadow: 0 4px 12px rgba(107,76,53,0.22); }
-.btn-next:hover { background: #4e3427; transform: translateY(-1px); }
-.btn-save { background: var(–green); color: white; box-shadow: 0 4px 12px rgba(122,170,136,0.28); }
+.btn-back { background: white; border: 2px solid #aac4d8; color: #3a6e8c; }
+.btn-back:hover { background: #e6eef4; }
+.btn-back:active { background: var(–orange); color: white; border-color: var(–orange); transform: scale(0.97); }
+.btn-next { background: #4a8ab0; color: white; box-shadow: 0 4px 14px rgba(74,138,176,0.35); border: 2px solid #3a7aa0; }
+.btn-next:hover { background: #3a7aa0; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(74,138,176,0.45); }
+.btn-next:active { background: var(–orange); border-color: #c86030; transform: scale(0.97); }
+.btn-save { background: var(–green); color: white; box-shadow: 0 4px 12px rgba(122,170,136,0.28); border: 2px solid #5a9068; }
 .btn-save:hover { background: #5a9068; transform: translateY(-1px); }
-.btn-save:disabled { background: var(–gray); cursor: not-allowed; transform: none; }
+.btn-save:active { background: var(–orange); border-color: #c86030; transform: scale(0.97); }
+.btn-save:disabled { background: var(–gray); cursor: not-allowed; transform: none; border-color: var(–gray); }
 
 /* ── Success ── */
 .success-card {
